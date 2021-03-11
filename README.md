@@ -69,13 +69,15 @@ const {
 } = useUndoableReducer(reducer, initialState, {
   maxHistory: 10,
   filterActionTypes: excludeActionTypes(['my_action_to_ignore']),
+  ignoreInitialState: true,
 });
 ```
 
-| Option            | Type     | Default   | Description                                          |
-| ----------------- | -------- | --------- | ---------------------------------------------------- |
-| maxHistory        | number   | 20        | The maximum number of items to keep in undo history. |
-| filterActionTypes | function | undefined | Actions to be ignored from undo history.             |
+| Option             | Type     | Default   | Description                                             |
+| ------------------ | -------- | --------- | ------------------------------------------------------- |
+| maxHistory         | number   | 20        | The maximum number of items to keep in undo history.    |
+| filterActionTypes  | function | undefined | Actions to be ignored from undo history.                |
+| ignoreInitialState | boolean  | undefined | Ignore the first state update and don't add to history. |
 
 ## excludeActionTypes
 
