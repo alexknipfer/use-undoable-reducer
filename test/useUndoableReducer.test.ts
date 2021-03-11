@@ -1,7 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import {
   useUndoableReducer,
-  UndoableHistoryTypes,
   excludeActionTypes,
 } from '../src/useUndoableReducer';
 
@@ -38,7 +37,7 @@ test('should undo history', () => {
   );
 
   act(() => result.current.dispatch({ type: INCREMENT }));
-  act(() => result.current.dispatch({ type: UndoableHistoryTypes.UNDO }));
+  act(() => result.current.triggerUndo());
 
   expect(result.current.canRedo).toBeTruthy();
   expect(result.current.canUndo).toBeFalsy();
@@ -54,9 +53,9 @@ test('should redo history', () => {
     act(() => result.current.dispatch({ type: INCREMENT }));
   }
 
-  act(() => result.current.dispatch({ type: UndoableHistoryTypes.UNDO }));
-  act(() => result.current.dispatch({ type: UndoableHistoryTypes.UNDO }));
-  act(() => result.current.dispatch({ type: UndoableHistoryTypes.REDO }));
+  act(() => result.current.triggerUndo());
+  act(() => result.current.triggerUndo());
+  act(() => result.current.triggerRedo());
 
   expect(result.current.canRedo).toBeTruthy();
   expect(result.current.canUndo).toBeTruthy();
@@ -74,17 +73,21 @@ test('should filter out ignored action types', () => {
   act(() => result.current.dispatch({ type: INCREMENT }));
   act(() => result.current.dispatch({ type: DECREMENT }));
   act(() => result.current.dispatch({ type: INCREMENT }));
-  act(() => result.current.dispatch({ type: UndoableHistoryTypes.UNDO }));
+  act(() => result.current.triggerUndo());
 
   expect(result.current.canRedo).toBeTruthy();
   expect(result.current.canUndo).toBeTruthy();
   expect(result.current.state.count).toBe(2);
 });
 
-test('should ignore initial state, cant undo', () => {
+test('should ignore initial state', () => {
   const { result } = renderHook(() =>
     useUndoableReducer(testReducer, initialState, { ignoreInitialState: true })
   );
+
+  act(() => result.current.dispatch({ type: INCREMENT }));
+  act(() => result.current.dispatch({ type: INCREMENT }));
+  act(() => result.current.triggerUndo());
 
   expect(result.current.canUndo).toBeFalsy();
 });
@@ -98,8 +101,8 @@ test('should only store state up to max history', () => {
     act(() => result.current.dispatch({ type: INCREMENT }));
   }
 
-  act(() => result.current.dispatch({ type: UndoableHistoryTypes.UNDO }));
-  act(() => result.current.dispatch({ type: UndoableHistoryTypes.UNDO }));
+  act(() => result.current.triggerUndo());
+  act(() => result.current.triggerUndo());
 
   expect(result.current.canUndo).toBeFalsy();
   expect(result.current.state.count).toBe(1);
