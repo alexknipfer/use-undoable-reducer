@@ -81,26 +81,6 @@ test('should filter out ignored action types', () => {
   expect(result.current.state.count).toBe(2);
 });
 
-test('should filter by payload value shouldExcludeFromHistory', () => {
-  const { result } = renderHook(() =>
-    useUndoableReducer(testReducer, initialState)
-  );
-
-  act(() => result.current.dispatch({ type: INCREMENT }));
-  act(() =>
-    result.current.dispatch({
-      type: DECREMENT,
-      payload: { shouldExcludeFromHistory: true },
-    })
-  );
-  act(() => result.current.dispatch({ type: INCREMENT }));
-  act(() => result.current.dispatch({ type: UndoableHistoryTypes.UNDO }));
-
-  expect(result.current.canRedo).toBeTruthy();
-  expect(result.current.canUndo).toBeTruthy();
-  expect(result.current.state.count).toBe(1);
-});
-
 test('should ignore initial state, cant undo', () => {
   const { result } = renderHook(() =>
     useUndoableReducer(testReducer, initialState, { ignoreInitialState: true })
